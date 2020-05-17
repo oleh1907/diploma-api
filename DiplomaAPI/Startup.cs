@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DiplomaBLL.Analysis;
+using DiplomaBLL.FileSave;
 using DiplomaDAL.Auth;
 using DiplomaDBL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +39,11 @@ namespace DiplomaAPI
             services.AddDbContext<DiplomaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IAuthRepository, AuthRepository>();
+
+            services.AddScoped<IFileService, fileService>();
+
+            services.AddScoped<IAnalysisService, AnalysisService>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -58,10 +65,11 @@ namespace DiplomaAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
